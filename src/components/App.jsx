@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Section, Title } from './App.Styled';
 import { GlobalStyle } from './GlobalStyle';
 import { ContactForm } from './ContactForm/ContactForm';
@@ -12,8 +12,18 @@ const baseContacts = [
   { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
 ];
 
+const localStorageKey = 'Home-Contacts';
+
+const contactsFromLocalStorage = () => {
+  const savedContacts = localStorage.getItem(localStorageKey);
+  if (savedContacts !== null) {
+    return JSON.parse(savedContacts);
+  }
+  return baseContacts;
+};
+
 export const App = () => {
-  const [contacts, setContacts] = useState(baseContacts);
+  const [contacts, setContacts] = useState(contactsFromLocalStorage);
   const [filter, setFilter] = useState('');
 
   const changeNameFilter = newName => {
@@ -36,6 +46,10 @@ export const App = () => {
       contacts.filter(contact => contact.id !== сontactId)
     );
   };
+
+  useEffect(() => {
+    localStorage.setItem(localStorageKey, JSON.stringify(contacts));
+  }, [contacts]);
 
   const visibleContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
